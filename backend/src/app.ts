@@ -3,6 +3,10 @@ import cookieParser from "cookie-parser";
 import cors from "cors"
 import { expectFailure } from "node:test";
 import authRoutes from './routes/authRoutes'
+import projectRoutes from './routes/projectRoutes'
+import skillRoutes from './routes/skillRoutes'
+import profileRoutes from './routes/profileRoutes'
+
 
 const app = express()
 
@@ -17,6 +21,9 @@ app.use(cookieParser())
 
 
 app.use('/api/auth' , authRoutes)
+app.use('/api/project' , projectRoutes)
+app.use('/api/skill' , skillRoutes)
+app.use('/api/profile' , profileRoutes)
 
 
 app.get('/api', (req , res)=>{
