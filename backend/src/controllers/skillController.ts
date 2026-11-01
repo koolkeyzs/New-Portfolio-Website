@@ -70,6 +70,15 @@ export const getSkillById = async (
   try {
     const { id } = req.params;
 
+    if (!mongoose.isValidObjectId(id)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid message ID."
+      });
+      return;
+    }
+
+
     const skill = await Skill.findById(id);
 
     if (!skill) {
