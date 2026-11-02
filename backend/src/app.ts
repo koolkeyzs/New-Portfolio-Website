@@ -6,6 +6,7 @@ import authRoutes from './routes/authRoutes'
 import projectRoutes from './routes/projectRoutes'
 import skillRoutes from './routes/skillRoutes'
 import profileRoutes from './routes/profileRoutes'
+import messageRoutes from './routes/messageRoutes'
 
 
 const app = express()
@@ -24,6 +25,8 @@ app.use('/api/auth' , authRoutes)
 app.use('/api/project' , projectRoutes)
 app.use('/api/skill' , skillRoutes)
 app.use('/api/profile' , profileRoutes)
+app.use('/api/messages' , messageRoutes)
+
 
 
 app.get('/api', (req , res)=>{

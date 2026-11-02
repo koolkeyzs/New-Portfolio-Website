@@ -73,7 +73,7 @@ export const getSkillById = async (
     if (!mongoose.isValidObjectId(id)) {
       res.status(400).json({
         success: false,
-        message: "Invalid message ID."
+        message: "Invalid ID."
       });
       return;
     }
@@ -111,6 +111,14 @@ export const updateSkill = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
+
+  if (!mongoose.isValidObjectId(id)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid ID."
+      });
+      return;
+    }
 
     const updatedSkill = await Skill.findByIdAndUpdate(
       id,
@@ -152,6 +160,15 @@ export const deleteSkill = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid ID."
+      });
+      return;
+    }
+
 
     const deletedSkill = await Skill.findByIdAndDelete(id);
 

@@ -73,6 +73,15 @@ export const getProjects = async ( req: Request,res: Response): Promise<void> =>
 export const getProjectById = async ( req: Request,res: Response): Promise<void> =>{
   try {
     const {id} = req.params
+
+    if (!mongoose.isValidObjectId(id)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid ID."
+      });
+      return;
+    }
+
     const projects = await Project.findById(id)
 
     if(!projects){
@@ -105,6 +114,15 @@ export const getProjectById = async ( req: Request,res: Response): Promise<void>
 export const updateProject =  async ( req: Request,res: Response): Promise<void> =>{
     try {
         const {id} = req.params
+
+        if (!mongoose.isValidObjectId(id)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid ID."
+      });
+      return;
+    }
+
 
         const updatedProject = await Project.findByIdAndUpdate(
             id,
@@ -144,6 +162,15 @@ export const updateProject =  async ( req: Request,res: Response): Promise<void>
 export const deleteProject =  async ( req: Request,res: Response): Promise<void> =>{
     try {
         const {id} = req.params
+
+        if (!mongoose.isValidObjectId(id)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid ID."
+      });
+      return;
+    }
+
 
         const deletedProject = await Project.findByIdAndDelete(id)
 
