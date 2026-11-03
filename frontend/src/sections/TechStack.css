@@ -1,0 +1,312 @@
+.tech-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 650px;
+  background: #f3f0e9;
+  color: #151515;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.tech-topbar,
+.tech-bottom {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  display: flex;
+  justify-content: space-between;
+  z-index: 5;
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.tech-topbar {
+  top: 35px;
+}
+
+.tech-bottom {
+  bottom: 30px;
+}
+
+/* INTRO SCENE */
+
+.tech-intro {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 100px 10%;
+}
+
+.tech-eyebrow,
+.tech-card-subtitle {
+  font-size: 10px;
+  letter-spacing: 3px;
+  font-weight: 800;
+  color: #ef5b32;
+}
+
+.tech-intro h2 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(55px, 8vw, 115px);
+  line-height: 0.95;
+  letter-spacing: -7px;
+  margin: 30px 0;
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.tech-intro-line {
+  display: block;
+  will-change: transform, opacity;
+}
+
+.tech-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px #171717;
+}
+
+.tech-intro p {
+  max-width: 390px;
+  color: #666;
+  line-height: 1.8;
+  font-size: 14px;
+}
+
+.tech-scroll-indicator {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 35px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  font-weight: 800;
+}
+
+.tech-scroll-line {
+  width: 65px;
+  height: 1px;
+  background: #ef5b32;
+}
+
+/* HORIZONTAL SHOWCASE */
+
+.tech-track-window {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.tech-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  display: flex;
+  width: max-content;
+  opacity: 0;
+  will-change: transform;
+}
+
+.tech-card {
+  position: relative;
+  width: 100vw;
+  height: 100%;
+  flex-shrink: 0;
+  padding: 12vh 10vw 10vh;
+  display: flex;
+  align-items: center;
+  background: #f3f0e9;
+  border-right: 1px solid #d8d3c9;
+}
+
+.tech-card:nth-child(even) {
+  background: #eae6dd;
+}
+
+.tech-card-number {
+  position: absolute;
+  top: 13%;
+  right: 10%;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tech-card-number span:last-child {
+  color: #aaa;
+}
+
+.tech-card-content {
+  position: relative;
+  z-index: 2;
+  width: min(650px, 80%);
+}
+
+.tech-card-content h3 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(45px, 7vw, 95px);
+  line-height: 0.95;
+  letter-spacing: -5px;
+  margin: 20px 0;
+}
+
+.tech-card-content p {
+  max-width: 400px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #686868;
+  margin-bottom: 30px;
+}
+
+.tech-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 600px;
+}
+
+.tech-pill {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 13px 17px;
+  border: 1px solid #c9c4ba;
+  background: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  font-weight: 700;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.tech-pill:hover {
+  background: #151515;
+  color: white;
+  transform: translateY(-5px);
+}
+
+.tech-pill-number {
+  color: #ef5b32;
+  font-size: 9px;
+}
+
+.tech-pill-arrow {
+  color: #ef5b32;
+}
+
+.tech-card-decoration {
+  position: absolute;
+  right: 8%;
+  bottom: 10%;
+  font-size: clamp(150px, 27vw, 390px);
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.035);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.tech-card-footer {
+  position: absolute;
+  bottom: 35px;
+  left: 10%;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #888;
+}
+
+/* TABLET */
+
+@media (max-width: 768px) {
+  .tech-topbar,
+  .tech-bottom {
+    left: 7%;
+    right: 7%;
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .tech-intro {
+    padding: 100px 7%;
+  }
+
+  .tech-intro h2 {
+    font-size: clamp(43px, 11vw, 75px);
+    letter-spacing: -3px;
+  }
+
+  .tech-card {
+    padding: 15vh 7vw 12vh;
+  }
+
+  .tech-card-content {
+    width: 100%;
+  }
+
+  .tech-card-content h3 {
+    font-size: clamp(43px, 11vw, 70px);
+    letter-spacing: -3px;
+  }
+
+  .tech-card-content p {
+    font-size: 12px;
+  }
+
+  .tech-pill {
+    padding: 11px;
+    gap: 9px;
+    font-size: 10px;
+  }
+
+  .tech-card-footer {
+    left: 7%;
+    font-size: 7px;
+  }
+}
+
+/* SMALL PHONES */
+
+@media (max-width: 420px) {
+  .tech-intro h2 {
+    font-size: clamp(38px, 10.5vw, 52px);
+    letter-spacing: -2.5px;
+  }
+
+  .tech-intro p {
+    font-size: 12px;
+  }
+
+  .tech-card-content h3 {
+    font-size: 42px;
+  }
+
+  .tech-list {
+    gap: 8px;
+  }
+
+  .tech-pill {
+    padding: 9px;
+    font-size: 9px;
+  }
+
+  .tech-card-decoration {
+    font-size: 150px;
+  }
+}
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+  .tech-pill {
+    transition: none;
+  }
+}

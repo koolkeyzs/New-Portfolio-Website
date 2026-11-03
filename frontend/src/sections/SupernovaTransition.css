@@ -1,0 +1,53 @@
+.supernova-section {
+  position: relative;
+  height: 100vh;
+  background: #070b18;
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 10;
+}
+
+.supernova-core {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  background: #fff;
+  box-shadow:
+    0 0 30px 15px #fff,
+    0 0 90px 45px #a9a1ff,
+    0 0 180px 90px #806aff,
+    0 0 300px 150px #5d42d8;
+  will-change: transform;
+}
+
+.supernova-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.supernova-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #b5a4ff;
+  box-shadow: 0 0 15px #8e75ff;
+  transform: rotate(var(--angle)) translateY(-45px);
+  transform-origin: 0 0;
+}
+
+.supernova-flash {
+  position: absolute;
+  inset: 0;
+  background: #f3f0e9;
+  opacity: 0;
+  pointer-events: none;
+}

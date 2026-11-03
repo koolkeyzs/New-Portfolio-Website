@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import Profile from "../models/profile";
+import uploadToCloudinary from "../utils/uploadToCloudinary";
 
 
 export const createProfile = async (
@@ -17,7 +18,16 @@ export const createProfile = async (
       return;
     }
 
-    const profile = await Profile.create(req.body);
+      // Upload image to Cloudinary
+            const imageUrl = req.file
+                ? await uploadToCloudinary(req.file)
+                : undefined;
+    
+
+    const profile = await Profile.create({
+      ...req.body,
+      profileImage : imageUrl
+    });
 
     res.status(201).json({
       success: true,
@@ -71,9 +81,19 @@ export const updateProfile = async (
   res: Response
 ): Promise<void> => {
   try {
+
+
+    const updateData = { ...req.body };
+    
+            // Upload a new image only if one was provided
+            if (req.file) {
+                updateData.profileImage = await uploadToCloudinary(req.file);
+            }
+    
+    
     const updatedProfile = await Profile.findOneAndUpdate(
       {},
-      req.body,
+      updateData,
       {
         new: true,
         runValidators: true

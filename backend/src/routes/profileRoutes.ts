@@ -1,4 +1,6 @@
 import { Router } from "express";
+import upload from '../middleware/upload'
+import protect from "../middleware/auth";
 
 import {
   createProfile,
@@ -7,18 +9,18 @@ import {
   deleteProfile
 } from "../controllers/profileController";
 
-import protect from "../middleware/auth";
+
 
 const router = Router();
 
 // Get profile
-router.get("/", protect, getProfile);
+router.get("/", getProfile);
 
 // Create profile
-router.post("/", protect, createProfile);
+router.post("/", protect, upload.single('profileImage') ,createProfile);
 
 // Update profile
-router.patch("/", protect, updateProfile);
+router.patch("/", protect,  upload.single('profileImage') , updateProfile);
 
 // Delete profile
 router.delete("/", protect, deleteProfile);

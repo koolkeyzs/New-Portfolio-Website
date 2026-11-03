@@ -22,8 +22,8 @@ app.use(cookieParser())
 
 
 app.use('/api/auth' , authRoutes)
-app.use('/api/project' , projectRoutes)
-app.use('/api/skill' , skillRoutes)
+app.use('/api/projects' , projectRoutes)
+app.use('/api/skills' , skillRoutes)
 app.use('/api/profile' , profileRoutes)
 app.use('/api/messages' , messageRoutes)
 

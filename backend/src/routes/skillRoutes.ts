@@ -13,7 +13,7 @@ import protect from "../middleware/auth";
 const router = Router();
 
 // Get all skills
-router.get("/", protect, getSkills);
+router.get("/", getSkills);
 
 // Get one skill
 router.get("/:id", protect, getSkillById);

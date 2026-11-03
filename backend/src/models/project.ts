@@ -31,10 +31,16 @@ const projectSchema = new Schema<IProject>(
     },
 
     technologies: {
-      type: [String],
-      required: true
-    },
-
+  type: [String],
+  required: true,
+  validate: {
+    validator: (value: string[]) =>
+      Array.isArray(value) &&
+      value.length > 0 &&
+      value.every((item) => item.trim().length > 0),
+    message: "At least one valid technology is required."
+  }
+},
     category: {
       type: String,
       required: true,
@@ -42,12 +48,16 @@ const projectSchema = new Schema<IProject>(
     },
 
     liveUrl: {
-      type: String
-    },
+  type: String,
+  trim: true,
+  match: [/^https?:\/\/.+/i, "Please provide a valid live URL."]
+},
 
-    githubUrl: {
-      type: String
-    },
+githubUrl: {
+  type: String,
+  trim: true,
+  match: [/^https?:\/\/.+/i, "Please provide a valid GitHub URL."]
+},
 
     featured: {
       type: Boolean,

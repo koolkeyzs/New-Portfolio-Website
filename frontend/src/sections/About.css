@@ -1,0 +1,504 @@
+.about-section {
+position: relative;
+height: 100vh;
+min-height: 650px;
+overflow: hidden;
+background: #0a1020;
+isolation: isolate;
+color: var(--text-primary);
+}
+
+.about-scene {
+position: absolute;
+inset: 0;
+width: 100%;
+height: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 100px 8%;
+}
+
+.about-scene-intro {
+z-index: 3;
+}
+
+.about-scene-portrait {
+z-index: 2;
+opacity: 0;
+}
+
+.about-scene-mindset {
+z-index: 1;
+opacity: 0;
+}
+
+.about-background-orb {
+position: absolute;
+z-index: -1;
+width: 550px;
+height: 550px;
+top: 15%;
+right: -180px;
+border-radius: 50%;
+background: rgba(102, 93, 255, 0.17);
+filter: blur(120px);
+pointer-events: none;
+}
+
+.about-background-line {
+position: absolute;
+z-index: -1;
+top: 50%;
+left: 0;
+width: 150%;
+height: 1px;
+background: linear-gradient(
+90deg,
+transparent,
+rgba(119, 169, 255, 0.2),
+rgba(177, 138, 255, 0.3),
+transparent
+);
+transform: rotate(-15deg);
+pointer-events: none;
+}
+
+/* INTRO SCENE */
+
+.about-intro-content {
+width: 100%;
+max-width: 1100px;
+margin: 0 auto;
+}
+
+.about-intro-label {
+display: inline-flex;
+align-items: center;
+gap: 12px;
+color: var(--accent-blue);
+font-size: 0.75rem;
+font-weight: 700;
+letter-spacing: 3px;
+margin-bottom: 35px;
+}
+
+.about-label-dot {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: var(--accent-purple);
+box-shadow: 0 0 15px var(--accent-purple);
+}
+
+.about-intro-title {
+max-width: 1000px;
+font-family: "Space Grotesk", sans-serif;
+font-size: clamp(3rem, 7vw, 6.5rem);
+line-height: 1.05;
+letter-spacing: -4px;
+font-weight: 600;
+margin-bottom: 35px;
+}
+
+.gradient-text {
+background: linear-gradient(
+100deg,
+#77a9ff 0%,
+#9e9aff 50%,
+#c3a1ff 100%
+);
+-webkit-background-clip: text;
+background-clip: text;
+color: transparent;
+}
+
+.about-intro-copy {
+max-width: 620px;
+color: var(--text-secondary);
+font-size: 1.05rem;
+line-height: 1.9;
+}
+
+.about-scroll-hint {
+display: inline-flex;
+align-items: center;
+gap: 15px;
+margin-top: 65px;
+color: #8f9bb8;
+font-size: 0.65rem;
+letter-spacing: 2px;
+}
+
+.about-scroll-hint span {
+color: var(--accent-blue);
+font-size: 1.2rem;
+}
+
+/* PORTRAIT SCENE */
+
+.about-portrait-container {
+display: grid;
+grid-template-columns: 0.85fr 1.15fr;
+align-items: center;
+gap: 100px;
+width: 100%;
+max-width: 1100px;
+}
+
+.about-photo-area {
+position: relative;
+width: 100%;
+max-width: 390px;
+margin: auto;
+}
+
+.about-photo-frame {
+position: relative;
+width: 100%;
+aspect-ratio: 4 / 5;
+overflow: hidden;
+border-radius: 20px;
+border: 1px solid rgba(151, 169, 255, 0.25);
+background: #111a32;
+box-shadow: 0 30px 100px rgba(0, 0, 0, 0.4);
+}
+
+.about-photo-frame::after {
+content: "";
+position: absolute;
+inset: 0;
+background: linear-gradient(
+180deg,
+transparent 55%,
+rgba(7, 11, 24, 0.35)
+);
+pointer-events: none;
+}
+
+.about-photo {
+display: block;
+width: 100%;
+height: 100%;
+object-fit: cover;
+object-position: center;
+}
+
+.photo-coordinate {
+position: absolute;
+color: var(--accent-light);
+font-size: 0.62rem;
+letter-spacing: 2px;
+}
+
+.photo-coordinate-top {
+top: -30px;
+left: 0;
+}
+
+.photo-coordinate-bottom {
+bottom: -30px;
+right: 0;
+}
+
+.about-person-text {
+max-width: 520px;
+}
+
+.about-person-text h2 {
+font-family: "Space Grotesk", sans-serif;
+font-size: clamp(3.5rem, 6vw, 6rem);
+line-height: 1;
+letter-spacing: -4px;
+margin-bottom: 30px;
+}
+
+.about-person-text p {
+color: var(--text-secondary);
+font-size: 0.98rem;
+line-height: 1.9;
+margin-bottom: 18px;
+}
+
+.about-focus-tags {
+display: flex;
+flex-wrap: wrap;
+gap: 10px;
+margin-top: 35px;
+}
+
+.about-focus-tags span {
+padding: 10px 14px;
+border: 1px solid rgba(119, 169, 255, 0.2);
+border-radius: 30px;
+color: #c4d3f5;
+font-size: 0.7rem;
+background: rgba(119, 169, 255, 0.05);
+}
+
+/* MINDSET SCENE */
+
+.mindset-content {
+width: 100%;
+max-width: 1100px;
+margin: auto;
+}
+
+.mindset-heading {
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+gap: 5px;
+font-family: "Space Grotesk", sans-serif;
+font-size: clamp(4rem, 10vw, 9rem);
+line-height: 1.05;
+letter-spacing: -6px;
+font-weight: 600;
+}
+
+.mindset-footer {
+margin-top: 45px;
+color: var(--text-secondary);
+font-size: 1rem;
+letter-spacing: 1px;
+}
+
+.mindset-index {
+position: absolute;
+right: 8%;
+bottom: 15%;
+color: rgba(195, 161, 255, 0.5);
+font-size: 0.75rem;
+letter-spacing: 3px;
+}
+
+/* SUPERNOVA TRANSITION */
+
+.about-supernova {
+position: absolute;
+inset: 0;
+z-index: 10;
+overflow: hidden;
+opacity: 0;
+pointer-events: none;
+background: transparent;
+}
+
+.supernova-core {
+position: absolute;
+top: 50%;
+left: 50%;
+width: 35px;
+height: 35px;
+border-radius: 50%;
+opacity: 0;
+transform: translate(-50%, -50%) scale(0);
+background: #fff;
+
+box-shadow:
+0 0 30px 15px #fff,
+0 0 80px 40px #c5b5ff,
+0 0 160px 80px #8d70ff,
+0 0 260px 130px #6545df;
+
+will-change: transform, opacity;
+}
+
+.supernova-particles {
+position: absolute;
+inset: 0;
+pointer-events: none;
+}
+
+.supernova-particle {
+position: absolute;
+top: 50%;
+left: 50%;
+width: 5px;
+height: 5px;
+border-radius: 50%;
+background: #c9baff;
+box-shadow: 0 0 15px #9c7aff;
+transform: translate(-50%, -50%);
+opacity: 0;
+will-change: transform, opacity;
+}
+
+.supernova-flash {
+position: absolute;
+inset: 0;
+background: #f3f0e9;
+opacity: 0;
+will-change: opacity;
+}
+
+/* PROGRESS LABEL */
+
+.about-progress {
+position: absolute;
+z-index: 11;
+left: 8%;
+right: 8%;
+bottom: 35px;
+display: flex;
+justify-content: space-between;
+color: #8490aa;
+font-size: 0.6rem;
+letter-spacing: 2px;
+pointer-events: none;
+}
+
+/* TABLET */
+
+@media (max-width: 900px) {
+.about-portrait-container {
+gap: 50px;
+}
+
+.about-photo-area {
+max-width: 320px;
+}
+
+.about-person-text h2 {
+font-size: 4rem;
+}
+
+.about-intro-title {
+letter-spacing: -3px;
+}
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+.about-section {
+min-height: 600px;
+}
+
+.about-scene {
+padding: 80px 7%;
+}
+
+.about-intro-title {
+font-size: clamp(2.8rem, 12vw, 4.5rem);
+letter-spacing: -2.5px;
+}
+
+.about-intro-copy {
+font-size: 0.92rem;
+line-height: 1.8;
+}
+
+.about-scroll-hint {
+margin-top: 45px;
+font-size: 0.55rem;
+}
+
+.about-portrait-container {
+grid-template-columns: 1fr;
+gap: 30px;
+align-content: center;
+max-height: 100%;
+}
+
+.about-photo-area {
+width: 48%;
+max-width: 210px;
+}
+
+.about-photo-frame {
+border-radius: 14px;
+}
+
+.about-person-text {
+max-width: 100%;
+}
+
+.about-person-text .about-intro-label {
+font-size: 0.55rem;
+margin-bottom: 15px;
+}
+
+.about-person-text h2 {
+font-size: 3rem;
+letter-spacing: -2px;
+margin-bottom: 15px;
+}
+
+.about-person-text p {
+font-size: 0.8rem;
+line-height: 1.65;
+margin-bottom: 10px;
+}
+
+.about-focus-tags {
+gap: 6px;
+margin-top: 15px;
+}
+
+.about-focus-tags span {
+padding: 7px 10px;
+font-size: 0.58rem;
+}
+
+.photo-coordinate {
+font-size: 0.48rem;
+}
+
+.photo-coordinate-top {
+top: -20px;
+}
+
+.photo-coordinate-bottom {
+bottom: -20px;
+}
+
+.mindset-heading {
+font-size: clamp(3.5rem, 13vw, 6rem);
+letter-spacing: -3px;
+}
+
+.mindset-footer {
+font-size: 0.85rem;
+line-height: 1.7;
+}
+
+.about-progress {
+bottom: 20px;
+font-size: 0.48rem;
+letter-spacing: 1px;
+}
+
+.supernova-core {
+width: 25px;
+height: 25px;
+}
+
+.supernova-particle {
+width: 3px;
+height: 3px;
+}
+}
+
+@media (max-width: 380px) {
+.about-photo-area {
+width: 42%;
+}
+
+.about-person-text h2 {
+font-size: 2.5rem;
+}
+
+.about-person-text p {
+font-size: 0.75rem;
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+.about-section *,
+.about-section *::before,
+.about-section *::after {
+animation: none !important;
+transition: none !important;
+}
+}

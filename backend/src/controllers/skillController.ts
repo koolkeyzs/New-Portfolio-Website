@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import Skill from "../models/skill";
+import mongoose from "mongoose";
 
 export const createSkill = async (
   req: Request,
