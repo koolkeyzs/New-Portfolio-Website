@@ -1,90 +1,96 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./TechStack.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const techCategories = [
-  {
-    number: "01",
-    title: "Backend",
-    subtitle: "ENGINEERING THE CORE",
-    description:
-      "Building the logic, architecture and systems that power digital products.",
-    technologies: [
-      "Node.js",
-      "Express.js",
-      "TypeScript",
-      "JavaScript",
-      "REST APIs",
-    ],
-  },
-  {
-    number: "02",
-    title: "Data",
-    subtitle: "STRUCTURING INFORMATION",
-    description:
-      "Working with data, designing storage systems and managing information.",
-    technologies: ["MongoDB", "Mongoose", "PostgreSQL"],
-  },
-  {
-    number: "03",
-    title: "Artificial Intelligence",
-    subtitle: "BUILDING INTELLIGENCE",
-    description:
-      "Exploring machine learning, natural language processing and intelligent applications.",
-    technologies: [
-      "Python",
-      "Scikit-learn",
-      "Pandas",
-      "NumPy",
-      "Matplotlib",
-      "NLP",
-      "LLMs",
-      "RAG",
-    ],
-  },
-  {
-    number: "04",
-    title: "AI Development",
-    subtitle: "TURNING MODELS INTO PRODUCTS",
-    description:
-      "Tools and frameworks for developing and deploying AI-powered applications.",
-    technologies: [
-      "Streamlit",
-      "Gemini API",
-      "Sentence Transformers",
-      "FastAPI",
-    ],
-  },
-  {
-    number: "05",
-    title: "Development",
-    subtitle: "CRAFTING THE EXPERIENCE",
-    description:
-      "The technologies and tools I use to build and deliver digital experiences.",
-    technologies: [
-      "React",
-      "HTML",
-      "CSS",
-      "Tailwind CSS",
-      "Git",
-      "GitHub",
-      "VS Code",
-    ],
-  },
-];
+interface Skill {
+  _id: string;
+  name: string;
+  category: string;
+  icon?: string;
+  proficiency?: string;
+}
+
+interface SkillsResponse {
+  success: boolean;
+  count: number;
+  skills: Skill[];
+}
+
+interface TechCategory {
+  title: string;
+  technologies: Skill[];
+}
 
 export default function TechStack() {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Fetch skills from the public backend endpoint.
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const API_URL = import.meta.env.VITE_API_URL;
+        const response = await fetch(`${API_URL}/api/skills`);
+
+        if (!response.ok) {
+          throw new Error("Failed to retrieve skills.");
+        }
+
+        const data: SkillsResponse = await response.json();
+
+        if (!data.success) {
+          throw new Error("Unable to load technology stack.");
+        }
+
+        setSkills(data.skills || []);
+      } catch (err) {
+        console.error("Fetch skills error:", err);
+        setError("Unable to load the technology stack.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSkills();
+  }, []);
+
+  // Group skills dynamically by category.
+  const techCategories: TechCategory[] = Object.values(
+    skills.reduce<Record<string, TechCategory>>((groups, skill) => {
+      const categoryName = skill.category.trim();
+
+      if (!categoryName) return groups;
+
+      if (!groups[categoryName]) {
+        groups[categoryName] = {
+          title: categoryName,
+          technologies: [],
+        };
+      }
+
+      groups[categoryName].technologies.push(skill);
+
+      return groups;
+    }, {})
+  );
+
   useLayoutEffect(() => {
     const section = sectionRef.current;
     const track = trackRef.current;
 
-    if (!section || !track) return;
+    if (!section || !track || loading || error || !techCategories.length) {
+      return;
+    }
 
     const ctx = gsap.context(() => {
       const intro = section.querySelector<HTMLElement>(".tech-intro");
@@ -106,7 +112,7 @@ export default function TechStack() {
       const getHorizontalDistance = () =>
         Math.max(0, track.scrollWidth - section.clientWidth);
 
-      const horizontalDuration = cards.length - 1;
+      const horizontalDuration = Math.max(1, cards.length - 1);
       const snapPoints: number[] = [];
 
       const timeline = gsap.timeline({
@@ -115,8 +121,7 @@ export default function TechStack() {
           start: "top top",
 
           end: () =>
-            `+=${window.innerHeight * 1.8 +
-            getHorizontalDistance()}`,
+            `+=${window.innerHeight * 1.8 + getHorizontalDistance()}`,
 
           pin: true,
           scrub: 1,
@@ -125,7 +130,9 @@ export default function TechStack() {
 
           snap: {
             snapTo: (progress) =>
-              gsap.utils.snap(snapPoints, progress),
+              snapPoints.length
+                ? gsap.utils.snap(snapPoints, progress)
+                : progress,
 
             duration: {
               min: 0.25,
@@ -204,33 +211,31 @@ export default function TechStack() {
         "<"
       );
 
-      // Record the exact beginning of horizontal movement.
+      // Record the beginning of horizontal movement.
       const horizontalStart = timeline.duration();
 
-      // Calculate the five snap positions.
+      // Calculate snap positions for every category.
       const horizontalEnd = horizontalStart + horizontalDuration;
       const totalDuration = horizontalEnd;
 
       for (let index = 0; index < cards.length; index++) {
-        const panelTime =
-          horizontalStart + index;
+        const panelTime = horizontalStart + index;
 
         snapPoints.push(panelTime / totalDuration);
       }
 
-      // Horizontal movement across the five panels.
+      // Horizontal movement across all category panels.
       timeline.to(track, {
         x: () => -getHorizontalDistance(),
         duration: horizontalDuration,
         ease: "none",
       });
 
-      // Refresh after layout has been calculated.
       ScrollTrigger.refresh();
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [loading, error, techCategories.length]);
 
   return (
     <section className="tech-section" ref={sectionRef}>
@@ -268,46 +273,111 @@ export default function TechStack() {
       {/* Horizontal technology showcase */}
       <div className="tech-track-window">
         <div className="tech-track" ref={trackRef}>
-          {techCategories.map((category) => (
-            <article className="tech-card" key={category.number}>
-              <div className="tech-card-number">
-                <span>{category.number}</span>
-                <span> / 05</span>
-              </div>
-
+          {loading ? (
+            <div className="tech-card">
               <div className="tech-card-content">
-                <span className="tech-card-subtitle">
-                  {category.subtitle}
-                </span>
+                <h3>Loading technologies...</h3>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="tech-card">
+              <div className="tech-card-content">
+                <h3>Something went wrong.</h3>
+                <p>{error}</p>
+              </div>
+            </div>
+          ) : techCategories.length === 0 ? (
+            <div className="tech-card">
+              <div className="tech-card-content">
+                <h3>No technologies yet.</h3>
+                <p>Technologies will appear here once they are added.</p>
+              </div>
+            </div>
+          ) : (
+            techCategories.map((category, index) => {
+              const number = String(index + 1).padStart(2, "0");
 
-                <h3>{category.title}</h3>
+              return (
+                <article className="tech-card" key={category.title}>
+                  <div className="tech-card-number">
+                    <span>{number}</span>
+                    <span>
+                      {" "}/ {String(techCategories.length).padStart(2, "0")}
+                    </span>
+                  </div>
 
-                <p>{category.description}</p>
+                  <div className="tech-card-content">
 
-                <div className="tech-list">
-                  {category.technologies.map((technology, index) => (
-                    <div className="tech-pill" key={technology}>
-                      <span className="tech-pill-number">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
+                    {/* TECHNOLOGY STACK — NOW AT THE TOP */}
+                    <div className="tech-list">
+                      {category.technologies.map((technology, skillIndex) => (
+                        <div className="tech-pill" key={technology._id}>
+                          <span className="tech-pill-number">
+                            {String(skillIndex + 1).padStart(2, "0")}
+                          </span>
 
-                      <span>{technology}</span>
+                          {technology.icon ? (
+                            <img
+                              src={technology.icon}
+                              alt={`${technology.name} logo`}
+                              className="tech-pill-icon"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <span
+                              className="tech-pill-icon-placeholder"
+                              aria-hidden="true"
+                            >
+                              {technology.name.charAt(0).toUpperCase()}
+                            </span>
+                          )}
 
-                      <span className="tech-pill-arrow">↗</span>
+                          <span className="tech-pill-name">
+                            {technology.name}
+                          </span>
+
+                          {technology.proficiency && (
+                            <span className="tech-pill-proficiency">
+                              {technology.proficiency}
+                            </span>
+                          )}
+
+                          <span className="tech-pill-arrow">↗</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
 
-              <div className="tech-card-decoration">
-                {category.number}
-              </div>
+                    {/* CATEGORY — NOW UNDER THE STACK */}
+                    <div className="tech-category-info">
+                      <div className="tech-category-badge">
+                        <span className="tech-category-label">
+                          CATEGORY
+                        </span>
 
-              <span className="tech-card-footer">
-                KELVIN OSA-IZEKO — SOFTWARE DEVELOPER
-              </span>
-            </article>
-          ))}
+                        <span className="tech-card-subtitle">
+                          {category.title}
+                        </span>
+                      </div>
+
+                      <p className="tech-category-description">
+                        Technologies and tools I use within{" "}
+                        {category.title.toLowerCase()} to build practical
+                        digital solutions.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="tech-card-decoration">
+                    {number}
+                  </div>
+
+                  <span className="tech-card-footer">
+                    KELVIN OSA-IZEKO — SOFTWARE DEVELOPER
+                  </span>
+                </article>
+              );
+            })
+          )}
         </div>
       </div>
 

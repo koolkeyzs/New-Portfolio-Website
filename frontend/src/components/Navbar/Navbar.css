@@ -1,0 +1,254 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 90px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+  background: transparent;
+  color: #fff;
+}
+
+.navbar-logo {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: -3px;
+  z-index: 1002;
+}
+
+.navbar-logo span,
+.navbar-dot {
+  color: #a78bfa;
+}
+
+.navbar-desktop {
+  display: flex;
+  align-items: center;
+  gap: 38px;
+}
+
+.navbar-desktop a {
+  position: relative;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar-desktop a:hover {
+  color: #a78bfa;
+  transform: translateY(-3px);
+}
+
+.navbar-socials {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+
+.navbar-socials a,
+.mobile-socials a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.65);
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar-socials a svg {
+  width: 18px;
+  height: 18px;
+}
+
+.navbar-socials a:hover,
+.mobile-socials a:hover {
+  color: #a78bfa;
+  transform: translateY(-4px);
+}
+
+.navbar-menu-button {
+  display: none;
+  border: none;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  z-index: 1002;
+}
+
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 35px 8% 30px;
+  background: #0a1020;
+  opacity: 0;
+  visibility: hidden;
+  clip-path: circle(0% at 95% 5%);
+  transition:
+    clip-path 0.75s cubic-bezier(0.76, 0, 0.24, 1),
+    opacity 0.4s ease,
+    visibility 0.75s;
+}
+
+.mobile-menu-open {
+  opacity: 1;
+  visibility: visible;
+  clip-path: circle(150% at 95% 5%);
+}
+
+.mobile-menu-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  letter-spacing: 4px;
+}
+
+.mobile-menu-top button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.mobile-menu-top button svg {
+  width: 26px;
+  height: 26px;
+}
+
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+  margin: auto 0;
+}
+
+.mobile-menu-links a {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 0;
+  color: #fff;
+  text-decoration: none;
+  font-size: clamp(2.8rem, 12vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: -3px;
+  opacity: 0;
+  transform: translateY(35px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    color 0.3s ease;
+}
+
+.mobile-menu-open .mobile-menu-links a {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mobile-menu-links a:hover {
+  color: #a78bfa;
+}
+
+.mobile-link-number {
+  min-width: 25px;
+  color: #a78bfa;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+}
+
+.mobile-link-arrow {
+  width: 25px;
+  height: 25px;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.mobile-menu-links a:hover .mobile-link-arrow {
+  opacity: 1;
+  transform: translate(5px, -5px);
+}
+
+.mobile-menu-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.mobile-menu-bottom > span {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+}
+
+.mobile-socials {
+  display: flex;
+  gap: 25px;
+}
+
+.mobile-socials a svg {
+  width: 22px;
+  height: 22px;
+}
+
+.mobile-menu-bottom p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 850px) {
+  .navbar {
+    height: 75px;
+    padding: 0 6%;
+  }
+
+  .navbar-desktop,
+  .navbar-socials {
+    display: none;
+  }
+
+  .navbar-menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .navbar-menu-button svg {
+    width: 27px;
+    height: 27px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-menu {
+    padding: 28px 7% 25px;
+  }
+
+  .mobile-menu-links a {
+    font-size: clamp(2.6rem, 13vw, 4rem);
+    gap: 12px;
+  }
+
+  .mobile-link-number {
+    font-size: 0.65rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar *,
+  .mobile-menu {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

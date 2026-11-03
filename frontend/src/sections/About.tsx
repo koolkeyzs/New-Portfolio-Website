@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./About.css";
@@ -7,10 +7,61 @@ gsap.registerPlugin(ScrollTrigger);
 
 const PARTICLE_COUNT = 48;
 
+interface IProfile {
+  name: string;
+  title: string[];
+  bio: string;
+  profileImage?: string;
+  location?: string;
+  email: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  resumeUrl?: string;
+}
+
+interface ProfileResponse {
+  success: boolean;
+  profile: IProfile;
+}
+
 const About = () => {
   const sectionRef = useRef<HTMLElement>(null);
 
+  const [profile, setProfile] = useState<IProfile | null>(null);
+  const [profileLoaded, setProfileLoaded] = useState(false);
+
+  // FETCH PROFILE FROM BACKEND
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/profile`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to retrieve profile.");
+        }
+
+        const data: ProfileResponse = await response.json();
+
+        if (data.success && data.profile) {
+          setProfile(data.profile);
+        }
+      } catch (error) {
+        console.error("Profile fetch error:", error);
+      } finally {
+        setProfileLoaded(true);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // GSAP ANIMATIONS
   useLayoutEffect(() => {
+    // Wait until profile fetching is complete
+    if (!profileLoaded) return;
+
     const section = sectionRef.current;
 
     if (!section) return;
@@ -65,10 +116,8 @@ const About = () => {
           "-=0.4"
         )
 
-        // SCENE 1 SETTLED
         .addLabel("intro")
 
-        // HOLD THE FIRST SCENE
         .to({}, { duration: 1 })
 
         // INTRODUCTION EXITS
@@ -116,10 +165,8 @@ const About = () => {
           "-=0.5"
         )
 
-        // SCENE 2 SETTLED
         .addLabel("portrait")
 
-        // HOLD THE PORTRAIT SCENE
         .to({}, { duration: 1 })
 
         // PORTRAIT EXITS
@@ -169,10 +216,8 @@ const About = () => {
           "-=0.3"
         )
 
-        // SCENE 3 SETTLED
         .addLabel("mindset")
 
-        // HOLD THE MINDSET SCENE
         .to({}, { duration: 1 })
 
         // ==========================================
@@ -198,7 +243,6 @@ const About = () => {
           "<"
         )
 
-        // CORE INTENSIFIES
         .to(core, {
           scale: 2.5,
           duration: 0.5,
@@ -246,13 +290,12 @@ const About = () => {
           "-=0.5"
         )
 
-        // KEEP WHITEOUT UNTIL ABOUT RELEASES
         .to({}, { duration: 0.5 })
 
         .addLabel("finish");
 
       // ==========================================
-      // ATTACH SCROLLTRIGGER AFTER TIMELINE IS BUILT
+      // SCROLLTRIGGER
       // ==========================================
 
       ScrollTrigger.create({
@@ -308,7 +351,7 @@ const About = () => {
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [profileLoaded]);
 
   return (
     <section className="about-section" id="about" ref={sectionRef}>
@@ -330,10 +373,8 @@ const About = () => {
           </h2>
 
           <p className="about-intro-copy">
-            I'm Kelvin, a Software Developer focused on backend
-            engineering and artificial intelligence. I enjoy exploring
-            how technology works and turning ideas into practical
-            digital solutions.
+            {profile?.bio ||
+              "I'm Kelvin, a Software Developer focused on backend engineering and artificial intelligence. I enjoy exploring how technology works and turning ideas into practical digital solutions."}
           </p>
 
           <span className="about-scroll-hint">
@@ -348,18 +389,18 @@ const About = () => {
           <div className="about-photo-area">
             <div className="about-photo-frame">
               <img
-                src="/kelvin.jpeg"
-                alt="Portrait of Kelvin"
+                src={profile?.profileImage || "/kelvin.jpeg"}
+                alt={`Portrait of ${profile?.name || "Kelvin"}`}
                 className="about-photo"
               />
             </div>
 
             <span className="photo-coordinate photo-coordinate-top">
-              KELVIN / 001
+              {profile?.name?.toUpperCase() || "KELVIN"} / 001
             </span>
 
             <span className="photo-coordinate photo-coordinate-bottom">
-              SOFTWARE DEVELOPER
+              {profile?.title?.[0]?.toUpperCase() || "SOFTWARE DEVELOPER"}
             </span>
           </div>
 
@@ -371,7 +412,10 @@ const About = () => {
             <h2>
               Hello,
               <br />
-              I'm <span className="gradient-text">Kelvin.</span>
+              I'm{" "}
+              <span className="gradient-text">
+                {profile?.name || "Kelvin"}.
+              </span>
             </h2>
 
             <p>

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -6,83 +6,33 @@ import "./Project.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
-type Project = {
-  number: string;
-  name: string;
-  category: string;
+interface Project {
+  _id: string;
+  title: string;
   description: string;
-  stack: string[];
-  accent: string;
-  features: string[];
-  github: string;
-  demo: string;
-};
+  image?: string;
+  technologies: string[];
+  category: string;
+  liveUrl?: string;
+  githubUrl?: string;
+  featured?: boolean;
+  published?: boolean;
+}
 
-const projects: Project[] = [
-  {
-    number: "01",
-    name: "Journex",
-    category: "PRODUCT / WEB APPLICATION",
-    description:
-      "A Christian journaling platform designed to help believers document their spiritual journey.",
-    stack: ["React", "Node.js", "Express", "MongoDB"],
-    accent: "#9b87f5",
-    features: [
-      "Personal journaling",
-      "Private and community entries",
-      "Daily Bible verse experience",
-    ],
-    github: "",
-    demo: "",
-  },
-  {
-    number: "02",
-    name: "ConnectFlow",
-    category: "SAAS / MANAGEMENT SYSTEM",
-    description:
-      "A church management platform bringing people, communication and attendance into one system.",
-    stack: ["React", "TypeScript", "Node.js", "MongoDB"],
-    accent: "#e9a23b",
-    features: [
-      "People management",
-      "Attendance management",
-      "Organisational communication",
-    ],
-    github: "",
-    demo: "",
-  },
-  {
-    number: "03",
-    name: "AI Research Assistant",
-    category: "ARTIFICIAL INTELLIGENCE",
-    description:
-      "An AI-powered tool that helps users explore documents and retrieve relevant information.",
-    stack: ["Python", "Streamlit", "Gemini", "RAG"],
-    accent: "#55a9a0",
-    features: [
-      "PDF document processing",
-      "Semantic retrieval",
-      "Grounded AI responses",
-    ],
-    github: "",
-    demo: "",
-  },
-  {
-    number: "04",
-    name: "Fake Job Detector",
-    category: "MACHINE LEARNING",
-    description:
-      "A machine learning application that analyses job postings and identifies potentially fraudulent listings.",
-    stack: ["Python", "Scikit-learn", "TF-IDF", "Streamlit"],
-    accent: "#e47b68",
-    features: [
-      "Job description analysis",
-      "Machine learning classification",
-      "Text, PDF and image input",
-    ],
-    github: "",
-    demo: "",
-  },
+interface ProjectsResponse {
+  success: boolean;
+  count: number;
+  projects: Project[];
+}
+
+const projectAccents = [
+  "#9b87f5",
+  "#e9a23b",
+  "#55a9a0",
+  "#e47b68",
+  "#6689bd",
+  "#bd829e",
+  "#789b72",
 ];
 
 export default function Projects() {
@@ -91,6 +41,7 @@ export default function Projects() {
   const rotationRef = useRef(0);
   const autoRotationRef = useRef<gsap.core.Tween | null>(null);
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const dragRef = useRef({
     active: false,
     moved: false,
@@ -98,15 +49,91 @@ export default function Projects() {
     startRotation: 0,
   });
 
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [orbitRadius, setOrbitRadius] = useState(260);
+
+  // Fetch published projects from the backend.
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const API_URL = import.meta.env.VITE_API_URL;
+        const response = await fetch(`${API_URL}/api/projects/public`);
+
+        if (!response.ok) {
+          throw new Error("Failed to retrieve projects.");
+        }
+
+        const data: ProjectsResponse = await response.json();
+
+        if (!data.success) {
+          throw new Error("Unable to load projects.");
+        }
+
+        setProjects(data.projects || []);
+      } catch (err) {
+        console.error("Fetch projects error:", err);
+        setError("Unable to load projects at the moment.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  // Calculate the angle occupied by each project.
+  const anglePerProject =
+    projects.length > 0 ? 360 / projects.length : 0;
+
+  // Adjust orbit radius while preserving the original radius
+  // for the original four-project layout.
+  useEffect(() => {
+    const updateOrbitRadius = () => {
+      const width = window.innerWidth;
+
+      const cardWidth =
+        width <= 600 ? 250 : 290;
+
+      const originalRadius =
+        width <= 600 ? 145 :
+        width <= 900 ? 210 :
+        260;
+
+      if (projects.length <= 4) {
+        setOrbitRadius(originalRadius);
+        return;
+      }
+
+      const minimumRadius =
+        (cardWidth + 35) /
+        (2 * Math.sin(Math.PI / projects.length));
+
+      setOrbitRadius(Math.max(originalRadius, minimumRadius));
+    };
+
+    updateOrbitRadius();
+
+    window.addEventListener("resize", updateOrbitRadius);
+
+    return () => {
+      window.removeEventListener("resize", updateOrbitRadius);
+    };
+  }, [projects.length]);
 
   const stopAutomaticRotation = () => {
     autoRotationRef.current?.pause();
 
     if (resumeTimerRef.current) {
       clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = null;
     }
   };
 
@@ -116,16 +143,20 @@ export default function Projects() {
     }
 
     resumeTimerRef.current = setTimeout(() => {
-      autoRotationRef.current?.play();
-      setIsPaused(false);
+      if (!activeProject) {
+        autoRotationRef.current?.play();
+        setIsPaused(false);
+      }
     }, 2500);
   };
 
   const rotateTo = (index: number) => {
+    if (!projects.length) return;
+
     stopAutomaticRotation();
     setIsPaused(true);
 
-    const targetRotation = -index * (360 / projects.length);
+    const targetRotation = -index * anglePerProject;
 
     gsap.to(rotationRef, {
       current: targetRotation,
@@ -146,14 +177,22 @@ export default function Projects() {
   };
 
   const navigate = (direction: number) => {
+    if (!projects.length) return;
+
     const nextIndex =
-      (activeIndex + direction + projects.length) % projects.length;
+      (activeIndex + direction + projects.length) %
+      projects.length;
 
     rotateTo(nextIndex);
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if ((event.target as HTMLElement).closest("button")) return;
+    if (
+      (event.target as HTMLElement).closest("button") ||
+      (event.target as HTMLElement).closest("a")
+    ) {
+      return;
+    }
 
     dragRef.current = {
       active: true,
@@ -164,6 +203,7 @@ export default function Projects() {
 
     stopAutomaticRotation();
     setIsPaused(true);
+
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
@@ -178,7 +218,8 @@ export default function Projects() {
 
     if (!dragRef.current.moved) return;
 
-    rotationRef.current = dragRef.current.startRotation + difference * 0.45;
+    rotationRef.current =
+      dragRef.current.startRotation + difference * 0.45;
 
     if (orbitRef.current) {
       gsap.set(orbitRef.current, {
@@ -192,15 +233,18 @@ export default function Projects() {
 
     dragRef.current.active = false;
 
+    if (!projects.length) return;
+
     const nearestIndex =
-      ((Math.round(-rotationRef.current / 90) % projects.length) +
+      ((Math.round(-rotationRef.current / anglePerProject) %
+        projects.length) +
         projects.length) %
       projects.length;
 
     setActiveIndex(nearestIndex);
 
     gsap.to(rotationRef, {
-      current: -nearestIndex * 90,
+      current: -nearestIndex * anglePerProject,
       duration: 0.5,
       ease: "power2.out",
       onUpdate: () => {
@@ -215,11 +259,14 @@ export default function Projects() {
     resumeAutomaticRotation();
   };
 
+  // Animate the section and initialise automatic rotation.
   useLayoutEffect(() => {
     const section = sectionRef.current;
     const orbit = orbitRef.current;
 
-    if (!section || !orbit) return;
+    if (!section || !orbit || loading || error || !projects.length) {
+      return;
+    }
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -251,17 +298,25 @@ export default function Projects() {
       });
 
       if (!reducedMotion) {
-        autoRotationRef.current = gsap.to(orbit, {
-          rotationY: -360,
+        autoRotationRef.current = gsap.to(rotationRef, {
+          current: rotationRef.current - 360,
           duration: 36,
           repeat: -1,
           ease: "none",
+          onUpdate: () => {
+            if (orbitRef.current) {
+              gsap.set(orbitRef.current, {
+                rotationY: rotationRef.current,
+              });
+            }
+          },
         });
       }
     }, section);
 
     return () => {
       autoRotationRef.current?.kill();
+      autoRotationRef.current = null;
 
       if (resumeTimerRef.current) {
         clearTimeout(resumeTimerRef.current);
@@ -269,7 +324,7 @@ export default function Projects() {
 
       ctx.revert();
     };
-  }, []);
+  }, [loading, error, projects.length]);
 
   return (
     <section className="projects-section" ref={sectionRef}>
@@ -311,58 +366,93 @@ export default function Projects() {
         <div className="orbit-guide orbit-guide-inner" />
 
         <div className="projects-orbit" ref={orbitRef}>
-          {projects.map((project, index) => (
-            <button
-              type="button"
-              className={`project-orbit-card project-card-${index + 1}`}
-              key={project.number}
-              onClick={() => {
-                if (!dragRef.current.moved) {
-                  stopAutomaticRotation();
-                  setIsPaused(true);
-                  setActiveProject(project);
-                }
-              }}
-              style={
-                {
-                  "--card-accent": project.accent,
-                  "--card-angle": `${index * 90}deg`,
-                } as CSSProperties
-              }
-              aria-label={`Explore ${project.name}`}
-            >
-              <div className="project-card-top">
-                <span>{project.category}</span>
-                <span>{project.number}</span>
-              </div>
+          {loading ? (
+            <div className="project-loading">
+              Loading projects...
+            </div>
+          ) : error ? (
+            <div className="project-loading">
+              {error}
+            </div>
+          ) : projects.length === 0 ? (
+            <div className="project-loading">
+              No published projects available yet.
+            </div>
+          ) : (
+            projects.map((project, index) => {
+              const number = String(index + 1).padStart(2, "0");
+              const accent =
+                projectAccents[index % projectAccents.length];
 
-              <div
-                className="project-card-art"
-                style={{ background: project.accent }}
-              >
-                <span className="project-art-number">
-                  {project.number}
-                </span>
-                <span className="project-art-symbol">✳</span>
-              </div>
+              return (
+                <button
+                  type="button"
+                  className={`project-orbit-card project-card-${index + 1}`}
+                  key={project._id}
+                  onClick={() => {
+                    if (!dragRef.current.moved) {
+                      stopAutomaticRotation();
+                      setIsPaused(true);
+                      setActiveProject(project);
+                    }
+                  }}
+                  style={
+                    {
+                      "--card-accent": accent,
+                      "--card-angle": `${index * anglePerProject}deg`,
+                      "--orbit-radius": `${orbitRadius}px`,
+                    } as CSSProperties
+                  }
+                  aria-label={`Explore ${project.title}`}
+                >
+                  <div className="project-card-top">
+                    <span>{project.category}</span>
+                    <span>{number}</span>
+                  </div>
 
-              <div className="project-card-info">
-                <h3>{project.name}</h3>
-                <p>{project.description}</p>
+                  <div
+                    className="project-card-art"
+                    style={{ background: accent }}
+                  >
+                    {project.image ? (
+                      <img
+                        src={project.image}
+                        alt={`${project.title} preview`}
+                        className="project-card-image"
+                      />
+                    ) : (
+                      <>
+                        <span className="project-art-number">
+                          {number}
+                        </span>
+                        <span className="project-art-symbol">
+                          ✳
+                        </span>
+                      </>
+                    )}
+                  </div>
 
-                <div className="project-stack">
-                  {project.stack.map((technology) => (
-                    <span key={technology}>{technology}</span>
-                  ))}
-                </div>
-              </div>
+                  <div className="project-card-info">
+                    <h3>{project.title}</h3>
+                    <p>{project.description}</p>
 
-              <div className="project-card-bottom">
-                <span>EXPLORE PROJECT</span>
-                <span>↗</span>
-              </div>
-            </button>
-          ))}
+                    <div className="project-stack">
+                      {project.technologies.map((technology) => (
+                        <span key={technology}>
+                          {technology}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="project-card-bottom">
+                    <span>EXPLORE PROJECT</span>
+                    <span>↗</span>
+                  </div>
+                </button>
+              );
+            })
+          )}
         </div>
 
         <div className="projects-orbit-label">
@@ -375,12 +465,13 @@ export default function Projects() {
             type="button"
             onClick={() => navigate(-1)}
             aria-label="Previous project"
+            disabled={!projects.length}
           >
             ←
           </button>
 
           <span>
-            {String(activeIndex + 1).padStart(2, "0")} /{" "}
+            {String(projects.length ? activeIndex + 1 : 0).padStart(2, "0")} /{" "}
             {String(projects.length).padStart(2, "0")}
           </span>
 
@@ -388,6 +479,7 @@ export default function Projects() {
             type="button"
             onClick={() => navigate(1)}
             aria-label="Next project"
+            disabled={!projects.length}
           >
             →
           </button>
@@ -405,6 +497,7 @@ export default function Projects() {
               }
             }}
             aria-label={isPaused ? "Resume rotation" : "Pause rotation"}
+            disabled={!projects.length}
           >
             {isPaused ? "PLAY" : "PAUSE"}
           </button>
@@ -447,32 +540,28 @@ export default function Projects() {
               {activeProject.category}
             </span>
 
-            <h2 id="project-modal-title">{activeProject.name}</h2>
+            <h2 id="project-modal-title">
+              {activeProject.title}
+            </h2>
 
             <p className="project-modal-description">
               {activeProject.description}
             </p>
 
-            <h3>KEY FEATURES</h3>
-
-            <ul>
-              {activeProject.features.map((feature) => (
-                <li key={feature}>{feature}</li>
-              ))}
-            </ul>
-
             <h3>TECHNOLOGIES</h3>
 
             <div className="project-stack project-modal-stack">
-              {activeProject.stack.map((technology) => (
-                <span key={technology}>{technology}</span>
+              {activeProject.technologies.map((technology) => (
+                <span key={technology}>
+                  {technology}
+                </span>
               ))}
             </div>
 
             <div className="project-modal-links">
-              {activeProject.github && (
+              {activeProject.githubUrl && (
                 <a
-                  href={activeProject.github}
+                  href={activeProject.githubUrl}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -480,9 +569,9 @@ export default function Projects() {
                 </a>
               )}
 
-              {activeProject.demo && (
+              {activeProject.liveUrl && (
                 <a
-                  href={activeProject.demo}
+                  href={activeProject.liveUrl}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -490,9 +579,10 @@ export default function Projects() {
                 </a>
               )}
 
-              {!activeProject.github && !activeProject.demo && (
-                <span>PROJECT LINKS COMING SOON</span>
-              )}
+              {!activeProject.githubUrl &&
+                !activeProject.liveUrl && (
+                  <span>PROJECT LINKS COMING SOON</span>
+                )}
             </div>
           </div>
         </div>
