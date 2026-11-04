@@ -175,6 +175,7 @@ const Hero = () => {
       ref={heroRef}
       className="hero"
       onMouseMove={handleMouseMove}
+      id="home"
     >
       {/* Background layers */}
       <div className="hero-grid" />

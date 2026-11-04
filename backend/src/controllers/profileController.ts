@@ -1,7 +1,44 @@
+
 import type { Request, Response } from "express";
 import Profile from "../models/profile";
 import uploadToCloudinary from "../utils/uploadToCloudinary";
 
+// Normalize professional titles into a clean string array
+const parseTitles = (title: unknown): string[] => {
+  if (Array.isArray(title)) {
+    return title
+      .flatMap((item) => parseTitles(item))
+      .filter(Boolean);
+  }
+
+  if (typeof title !== "string") {
+    return [];
+  }
+
+  const trimmedTitle = title.trim();
+
+  if (!trimmedTitle) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(trimmedTitle);
+
+    if (Array.isArray(parsed)) {
+      return parsed
+        .filter((item): item is string => typeof item === "string")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+  } catch {
+    // Not JSON: treat it as comma-separated text below.
+  }
+
+  return trimmedTitle
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
 
 export const createProfile = async (
   req: Request,
@@ -18,15 +55,15 @@ export const createProfile = async (
       return;
     }
 
-      // Upload image to Cloudinary
-            const imageUrl = req.file
-                ? await uploadToCloudinary(req.file)
-                : undefined;
-    
+    // Upload image to Cloudinary
+    const imageUrl = req.file
+      ? await uploadToCloudinary(req.file)
+      : undefined;
 
     const profile = await Profile.create({
       ...req.body,
-      profileImage : imageUrl
+      title: parseTitles(req.body.title),
+      profileImage: imageUrl
     });
 
     res.status(201).json({
@@ -44,7 +81,6 @@ export const createProfile = async (
     });
   }
 };
-
 
 export const getProfile = async (
   req: Request,
@@ -81,16 +117,18 @@ export const updateProfile = async (
   res: Response
 ): Promise<void> => {
   try {
-
-
     const updateData = { ...req.body };
-    
-            // Upload a new image only if one was provided
-            if (req.file) {
-                updateData.profileImage = await uploadToCloudinary(req.file);
-            }
-    
-    
+
+    // Always normalize titles before saving
+    if (updateData.title !== undefined) {
+      updateData.title = parseTitles(updateData.title);
+    }
+
+    // Upload a new image only if one was provided
+    if (req.file) {
+      updateData.profileImage = await uploadToCloudinary(req.file);
+    }
+
     const updatedProfile = await Profile.findOneAndUpdate(
       {},
       updateData,

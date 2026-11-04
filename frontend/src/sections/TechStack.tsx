@@ -238,7 +238,7 @@ export default function TechStack() {
   }, [loading, error, techCategories.length]);
 
   return (
-    <section className="tech-section" ref={sectionRef}>
+    <section className="tech-section" ref={sectionRef} id="skills">
       <div className="tech-topbar">
         <span>THE TECHNOLOGY BEHIND THE WORK</span>
         <span>MY STACK / 2026</span>

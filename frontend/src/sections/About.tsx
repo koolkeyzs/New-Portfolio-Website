@@ -1,3 +1,4 @@
+
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -400,7 +401,9 @@ const About = () => {
             </span>
 
             <span className="photo-coordinate photo-coordinate-bottom">
-              {profile?.title?.[0]?.toUpperCase() || "SOFTWARE DEVELOPER"}
+              {profile?.title?.length
+                ? profile.title.join(" | ").toUpperCase()
+                : "SOFTWARE DEVELOPER"}
             </span>
           </div>
 

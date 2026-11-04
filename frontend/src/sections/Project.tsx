@@ -327,7 +327,7 @@ export default function Projects() {
   }, [loading, error, projects.length]);
 
   return (
-    <section className="projects-section" ref={sectionRef}>
+    <section className="projects-section" ref={sectionRef} id="projects">
       <div className="projects-topbar">
         <span>04 — SELECTED WORK</span>
         <span>IDEAS INTO REALITY</span>

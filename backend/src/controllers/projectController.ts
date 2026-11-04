@@ -1,7 +1,33 @@
+
 import type { Request, Response } from "express";
 import Project from "../models/project";
 import mongoose from "mongoose";
 import uploadToCloudinary from "../utils/uploadToCloudinary";
+
+// Convert technologies from an array, JSON string, or comma-separated string
+// into a clean array of strings.
+const parseTechnologies = (technologies: unknown): string[] => {
+  let technologyList: unknown[] = [];
+
+  if (Array.isArray(technologies)) {
+    technologyList = technologies;
+  } else if (typeof technologies === "string") {
+    try {
+      const parsed = JSON.parse(technologies);
+
+      technologyList = Array.isArray(parsed)
+        ? parsed
+        : technologies.split(",");
+    } catch {
+      technologyList = technologies.split(",");
+    }
+  }
+
+  return technologyList
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
 
 export const createProject = async (
   req: Request,
@@ -36,18 +62,8 @@ export const createProject = async (
       return;
     }
 
-    // Convert technologies into an array
-    const technologyList: unknown[] = Array.isArray(technologies)
-      ? technologies
-      : typeof technologies === "string"
-        ? technologies.split(",")
-        : [];
-
-    // Clean and validate technologies
-    const cleanedTechnologies = technologyList
-      .filter((item): item is string => typeof item === "string")
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0);
+    // Parse and clean technologies
+    const cleanedTechnologies = parseTechnologies(technologies);
 
     if (cleanedTechnologies.length === 0) {
       res.status(400).json({
@@ -87,7 +103,6 @@ export const createProject = async (
       ? await uploadToCloudinary(req.file)
       : undefined;
 
-    
     const project = await Project.create({
       title: title.trim(),
       description: description.trim(),
@@ -105,7 +120,6 @@ export const createProject = async (
       message: "Project created successfully.",
       project,
     });
-
   } catch (error) {
     console.error("Create project error:", error);
 
@@ -133,6 +147,7 @@ export const getPublicProjects = async (
     });
   } catch (error) {
     console.error("Get public projects error:", error);
+
     res.status(500).json({
       success: false,
       message: "Failed to retrieve projects",
@@ -155,6 +170,7 @@ export const getProjects = async (
     });
   } catch (error) {
     console.error("Get projects error:", error);
+
     res.status(500).json({
       success: false,
       message: "Failed to retrieve projects",
@@ -193,6 +209,7 @@ export const getProjectById = async (
     });
   } catch (error) {
     console.error("Get projects error", error);
+
     res.status(500).json({
       success: false,
       message: "Failed to retrieve project",
@@ -216,6 +233,23 @@ export const updateProject = async (
     }
 
     const updateData = { ...req.body };
+
+    // Parse technologies only when they are included in the update
+    if (updateData.technologies !== undefined) {
+      const cleanedTechnologies = parseTechnologies(
+        updateData.technologies,
+      );
+
+      if (cleanedTechnologies.length === 0) {
+        res.status(400).json({
+          success: false,
+          message: "Please provide at least one valid technology.",
+        });
+        return;
+      }
+
+      updateData.technologies = cleanedTechnologies;
+    }
 
     // Upload a new image only if one was provided
     if (req.file) {
@@ -242,6 +276,7 @@ export const updateProject = async (
     });
   } catch (error) {
     console.error("Update project error", error);
+
     res.status(500).json({
       success: false,
       message: "Failed to update project",
@@ -273,12 +308,14 @@ export const deleteProject = async (
       });
       return;
     }
+
     res.status(200).json({
       success: true,
       message: "project successfully deleted",
     });
   } catch (error) {
     console.error("Delete project error", error);
+
     res.status(500).json({
       success: false,
       message: "Failed to delete project",

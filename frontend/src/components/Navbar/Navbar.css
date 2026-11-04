@@ -1,3 +1,4 @@
+
 .navbar {
   position: fixed;
   top: 0;
@@ -73,6 +74,55 @@
   transform: translateY(-4px);
 }
 
+/* Resume and Admin buttons */
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-resume,
+.navbar-admin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 7px;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.navbar-resume {
+  color: #fff;
+  background: rgba(167, 139, 250, 0.13);
+  border: 1px solid rgba(167, 139, 250, 0.5);
+}
+
+.navbar-resume:hover {
+  background: #a78bfa;
+  color: #0a1020;
+  transform: translateY(-2px);
+}
+
+.navbar-admin {
+  color: #fff;
+  background: #7654e8;
+  border: 1px solid #7654e8;
+}
+
+.navbar-admin:hover {
+  background: #8b6cf0;
+  border-color: #8b6cf0;
+  transform: translateY(-2px);
+}
+
+/* Mobile menu button */
+
 .navbar-menu-button {
   display: none;
   border: none;
@@ -81,6 +131,8 @@
   cursor: pointer;
   z-index: 1002;
 }
+
+/* Mobile menu */
 
 .mobile-menu {
   position: fixed;
@@ -179,6 +231,21 @@
   transform: translate(5px, -5px);
 }
 
+/* Mobile Resume and Admin buttons */
+
+.mobile-menu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.mobile-menu-actions .navbar-resume,
+.mobile-menu-actions .navbar-admin {
+  padding: 12px 17px;
+  font-size: 0.85rem;
+}
+
 .mobile-menu-bottom {
   display: flex;
   flex-direction: column;
@@ -207,6 +274,31 @@
   font-size: 0.75rem;
 }
 
+/* Responsive */
+
+@media (max-width: 1100px) {
+  .navbar {
+    padding: 0 5%;
+  }
+
+  .navbar-desktop {
+    gap: 22px;
+  }
+
+  .navbar-socials {
+    gap: 12px;
+  }
+
+  .navbar-actions {
+    gap: 8px;
+  }
+
+  .navbar-resume,
+  .navbar-admin {
+    padding: 9px 12px;
+  }
+}
+
 @media (max-width: 850px) {
   .navbar {
     height: 75px;
@@ -214,7 +306,8 @@
   }
 
   .navbar-desktop,
-  .navbar-socials {
+  .navbar-socials,
+  .navbar-actions {
     display: none;
   }
 
@@ -230,6 +323,8 @@
   }
 }
 
+
+
 @media (max-width: 480px) {
   .mobile-menu {
     padding: 28px 7% 25px;
@@ -242,6 +337,23 @@
 
   .mobile-link-number {
     font-size: 0.65rem;
+  }
+}
+
+@media (max-height: 700px) {
+  .mobile-menu {
+    overflow-y: auto;
+    justify-content: flex-start;
+    gap: 25px;
+  }
+
+  .mobile-menu-links {
+    margin: 20px 0;
+  }
+
+  .mobile-menu-links a {
+    font-size: clamp(2rem, 8vh, 3.5rem);
+    padding: 6px 0;
   }
 }
 
